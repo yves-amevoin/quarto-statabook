@@ -1,0 +1,33 @@
+# Introduction
+
+Partie introductive. On peut charger ici les bases de données de cette partie
+et les afficher.
+
+
+```{r}
+library(haven)
+library(gt)
+```
+
+
+
+On charge ici en test la base de données `test.dta`
+
+
+```{r}
+
+df <- haven::read_dta("datasets/test.dta")
+
+# on peut faire certains formatages à la base de données df
+
+gt(df) |> 
+    cols_label(
+        moy = "Moyenne",
+        min = "Minimum",
+        max = "Maximum",
+        p50 = "Meidane"
+    )
+
+```
+
+
