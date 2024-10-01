@@ -7,9 +7,10 @@ book:
   date: today
   chapters:
     - index.qmd
-    - intro.qmd
-    - summary.qmd
-    - references.qmd
+    - chapters/intro.qmd
+    - chapters/chap1.qmd
+    - chapters/summary.qmd
+    - chapters/references.qmd
 
 bibliography: references.bib
 
@@ -17,6 +18,13 @@ format:
   docx:
     theme: cosmo
     reference-doc: custom_reference.docx
+    execute:
+      echo: false
+      message: false
+      warning: false
+    filters:
+      - filters/landscape.lua
+    
 
 
 

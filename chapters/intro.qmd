@@ -1,0 +1,55 @@
+# Introduction
+
+Partie introductive. On peut charger ici les bases de données de cette partie
+et les afficher.
+
+
+```{r}
+library(haven)
+library(gt)
+library(tidyverse)
+```
+
+
+On charge ici en test la base de données `test.dta` que l'on présente directement.
+
+```{r}
+
+df <- haven::read_dta(here::here("datasets", "test.dta"))
+# on peut faire certains formatages à la base de données df
+
+gt(df) |> 
+    cols_label(
+        moy = "Moyenne",
+        min = "Minimum",
+        max = "Maximum",
+        p50 = "Mediane"
+    )
+
+```
+
+
+Supposons que l'on veuille coller des colonnes d'une base pour respecter
+certains formats. On veut par exemple coller la moyenne, la mediane etc.
+Et garder les noms des variables. Pour coller on utilise `glue::glue`. Tout
+ce qui est entre accolades sont les éléments de la base qu'on veut fusionner.
+
+```{r}
+
+df <- haven::read_dta(here::here("datasets", "test.dta"))
+df <- df |> 
+    # on ajuste les stats que l'on veut afficher
+    dplyr::mutate(
+        stats = glue::glue("{p50} [{min} - {max}]")
+    ) |> 
+    # on ne selectionne que ce que l'on veut
+    dplyr::select(variable, stats)
+
+
+# on affiche la table
+gt(df) |> 
+  cols_label(
+    variable = "Variables",
+    stats = "Med [min - max]"
+  )
+```
