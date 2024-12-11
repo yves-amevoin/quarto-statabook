@@ -35,7 +35,8 @@ df |>
   flextable() |> 
   # ici je montre comment mettre des couleurs sur le titre,
   # i c'est la ou les lignes, j c'est la colonne, part c'est la partie
-  bg(i = 1, part = "header", bg = "lightblue")
+  bg(i = 1, part = "header", bg = "lightblue") |> 
+  set_table_properties(layout = "autofit", width = 1)
 ```
 
 

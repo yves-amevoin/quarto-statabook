@@ -25,7 +25,7 @@ Voici du texte en paysage dans le document. On peut même insérer des tables.
 Ici j'affiche le code avec `echo: true`.
 
 ```{r}
-#| echo: false
+#| echo: true
 #| output: true
 
 df <- haven::read_dta(here::here("output_datasets", "test_quali.dta"))
