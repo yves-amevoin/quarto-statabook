@@ -1,55 +1,107 @@
 # Introduction
 
 Partie introductive. On peut charger ici les bases de données de cette partie
-et les afficher.
+et les afficher. Attention, il faut charger les librairies dans chacune
+des sections que l'on veut.
 
 
 ```{r}
 library(haven)
-library(gt)
+library(flextable)
 library(tidyverse)
+
+# on peut definir les proprietes du tableau de sortie
+set_flextable_defaults(
+   font.size = 12,
+   them_fun = "vanilla"
+)
 ```
 
 
-On charge ici en test la base de données `test.dta` que l'on présente directement.
+On charge ici en test la base de données `test_quali.dta` que l'on présente directement.
+Les données sont présentées avec le package `flextable` qui offre plus
+de possiblités pour les modifications au niveau des docx.
 
 ```{r}
 
-df <- haven::read_dta(here::here("datasets", "test.dta"))
+df <- haven::read_dta(here::here("output_datasets", "test_quali.dta"))
 # on peut faire certains formatages à la base de données df
 
-gt(df) |> 
-    cols_label(
-        moy = "Moyenne",
-        min = "Minimum",
-        max = "Maximum",
-        p50 = "Mediane"
-    )
-
+df |> 
+  # on ne selectione que les colonnes que l'on veut ici
+  select(label, value) |> 
+  # on peut ajouter des noms aux colonnes
+  setNames(c("Origine des voitures", "N (%)")) |> 
+  flextable() |> 
+  # ici je montre comment mettre des couleurs sur le titre,
+  # i c'est la ou les lignes, j c'est la colonne, part c'est la partie
+  bg(i = 1, part = "header", bg = "lightblue")
 ```
 
 
-Supposons que l'on veuille coller des colonnes d'une base pour respecter
-certains formats. On veut par exemple coller la moyenne, la mediane etc.
-Et garder les noms des variables. Pour coller on utilise `glue::glue`. Tout
-ce qui est entre accolades sont les éléments de la base qu'on veut fusionner.
+On effectue ici un autre test avec une
+autre base de données. Ici on peut décider de ne sélectionner
+que certaines variables, et de mettre les labels sur les variables en utilisant
+les labels de stata. On n'affiche ici que la sortie du code. On peut
+aussi vouloir que la table couvre correctement la  en page (grace au layout)
+
+
+```{r}
+#| echo: false
+#| output: true
+
+df <- haven::read_dta(here::here("output_datasets", "test_quali3.dta"))
+
+# les labels sont les noms de colonnes apres
+new_names <- c( "Variables", attributes(df$value_0)[["label"]], attributes(df$value_1)[["label"]])
+# on affiche la table
+df |> 
+  select(label, value_0, value_1) |>
+  setNames(new_names) |>
+  flextable() |>
+  set_table_properties(layout = "autofit")
+```
+
+
+On peut grouper ici plusieurs tables si l'ont veut les combiner, comme par 
+exemple quali_2 et quali_3
+
 
 ```{r}
 
-df <- haven::read_dta(here::here("datasets", "test.dta"))
-df <- df |> 
-    # on ajuste les stats que l'on veut afficher
-    dplyr::mutate(
-        stats = glue::glue("{p50} [{min} - {max}]")
-    ) |> 
-    # on ne selectionne que ce que l'on veut
-    dplyr::select(variable, stats)
+tables_files <- c("test_quali2.dta", "test_quali3.dta")
+tables_files <- here::here("output_datasets", tables_files)
 
+#ici on utilise une fonction qui les deux tables et les combine ensuite
+df1 <- read_dta(tables_files[1])
+df2 <- read_dta(tables_files[2])
+
+# les labels sont les noms de colonnes apres
+new_names <- c( "Variables", attributes(df1$value_0)[["label"]], attributes(df1$value_1)[["label"]])
 
 # on affiche la table
-gt(df) |> 
-  cols_label(
-    variable = "Variables",
-    stats = "Med [min - max]"
-  )
+bind_rows(df1, df2) |> 
+  select(label, value_0, value_1) |>
+  setNames(new_names) |>
+  flextable() |>
+  set_table_properties(layout = "autofit") |> 
+  # on peut mettre la première colonne en gras grace au theme vanilla
+  theme_vanilla() |>
+  # on ajoute un titre avec set_captioin
+  set_caption("Titre de la table")
+
+# on peut décider de ne mettre en exergue que les High Prices par ex.
+
+# on affiche la table
+bind_rows(df1, df2) |> 
+  select(label, value_0, value_1) |>
+  setNames(new_names) |>
+  flextable() |>
+  set_table_properties(layout = "autofit") |> 
+  # on peut mettre la première colonne en gras grace au theme vanilla
+  theme_vanilla() |>
+  # on ajoute un titre avec set_captioin
+  set_caption("Titre de la table") |> 
+  italic(i = ~(Variables == "High Prices")) # ca marche aussi pour bold, bg, color, etc.
+
 ```

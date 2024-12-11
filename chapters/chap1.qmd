@@ -6,8 +6,17 @@ Au début de chaque chapitre, il faut charger les packages nécessaires:
 
 ```{r}
 #| warning: false
+
 library(tidyverse)
-library(gt)
+
+# on utilise la librairie flextable pour les tableaux
+library(flextable)
+
+# on peut definir les proprietes du tableau de sortie
+set_flextable_defaults(
+   font.size = 12,
+   them_fun = "vanilla"
+)
 ```
 
 ::: landscape
@@ -16,21 +25,14 @@ Voici du texte en paysage dans le document. On peut même insérer des tables.
 Ici j'affiche le code avec `echo: true`.
 
 ```{r}
-#| echo: true
+#| echo: false
+#| output: true
 
-df <- haven::read_dta(here::here("datasets", "test.dta"))
+df <- haven::read_dta(here::here("output_datasets", "test_quali.dta"))
 
-# on peut faire certains formatages à la base de données df
-gt(df) |> 
-    cols_label(
-        moy = "Moyenne",
-        min = "Minimum",
-        max = "Maximum",
-        p50 = "Mediane"
-    )
+flextable(df) |> 
+   set_table_properties(layout = "autofit", width = 1)
 
 ```
-
-
 
 :::
